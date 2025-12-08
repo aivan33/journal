@@ -42,10 +42,11 @@ export function EntryForm() {
     setIsSubmitting(false)
   }
 
-  function handleKeyDown(e: React.KeyboardEvent) {
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) {
     // Submit on Cmd+Enter (macOS) or Ctrl+Enter (Windows/Linux)
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault()
+      e.stopPropagation()
       if (formRef.current && !isSubmitting) {
         const formData = new FormData(formRef.current)
         handleSubmit(formData)
@@ -95,7 +96,7 @@ export function EntryForm() {
           htmlFor="content"
           className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
         >
-          Content (Markdown supported) • Cmd+Enter to submit
+          Content (Markdown supported) • Cmd+Enter to submit • [brackets] for todos
         </label>
         <AutoTextarea
           id="content"

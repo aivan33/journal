@@ -1,70 +1,70 @@
 'use client'
 
 import { useState } from 'react'
-import { toggleTask, archiveTask } from '@/app/tasks/actions'
-import type { Task } from '@/lib/supabase/types'
+import { toggleTodo, archiveTodo } from '@/app/todo/actions'
+import type { Todo } from '@/lib/supabase/types'
 import Link from 'next/link'
 
-type TaskListProps = {
-  tasks: Task[]
+type TodoListProps = {
+  todos: Todo[]
 }
 
-export function TaskList({ tasks }: TaskListProps) {
-  const [optimisticTasks, setOptimisticTasks] = useState(tasks)
+export function TodoList({ todos }: TodoListProps) {
+  const [optimisticTodos, setOptimisticTodos] = useState(todos)
 
-  async function handleToggle(taskId: string, completed: boolean) {
+  async function handleToggle(todoId: string, completed: boolean) {
     // Optimistic update
-    setOptimisticTasks(prev =>
-      prev.map(task =>
-        task.id === taskId ? { ...task, completed } : task
+    setOptimisticTodos(prev =>
+      prev.map(todo =>
+        todo.id === todoId ? { ...todo, completed } : todo
       )
     )
 
-    const result = await toggleTask(taskId, completed)
+    const result = await toggleTodo(todoId, completed)
     if (result.error) {
       // Revert on error
-      setOptimisticTasks(tasks)
+      setOptimisticTodos(todos)
       alert(result.error)
     }
   }
 
-  async function handleArchive(taskId: string) {
+  async function handleArchive(todoId: string) {
     // Optimistic update
-    setOptimisticTasks(prev => prev.filter(task => task.id !== taskId))
+    setOptimisticTodos(prev => prev.filter(todo => todo.id !== todoId))
 
-    const result = await archiveTask(taskId)
+    const result = await archiveTodo(todoId)
     if (result.error) {
       // Revert on error
-      setOptimisticTasks(tasks)
+      setOptimisticTodos(todos)
       alert(result.error)
     }
   }
 
   return (
     <div className="space-y-2">
-      {optimisticTasks.map(task => {
-        const dueDate = task.due_date ? new Date(task.due_date) : null
-        const isOverdue = dueDate && dueDate < new Date() && !task.completed
+      {optimisticTodos.map(todo => {
+        const dueDate = todo.due_date ? new Date(todo.due_date) : null
+        const isOverdue = dueDate && dueDate < new Date() && !todo.completed
 
         return (
           <div
-            key={task.id}
+            key={todo.id}
             className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
           >
             <input
               type="checkbox"
-              checked={task.completed}
-              onChange={(e) => handleToggle(task.id, e.target.checked)}
+              checked={todo.completed}
+              onChange={(e) => handleToggle(todo.id, e.target.checked)}
               className="h-5 w-5 rounded border-zinc-300 text-zinc-900 focus:ring-2 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-800"
             />
 
             <div className="flex-1">
               <p
                 className={`text-zinc-900 dark:text-zinc-50 ${
-                  task.completed ? 'line-through opacity-60' : ''
+                  todo.completed ? 'line-through opacity-60' : ''
                 }`}
               >
-                {task.content}
+                {todo.content}
               </p>
 
               <div className="mt-1 flex items-center gap-3 text-sm">
@@ -80,9 +80,9 @@ export function TaskList({ tasks }: TaskListProps) {
                   </span>
                 )}
 
-                {task.entry_id && (
+                {todo.entry_id && (
                   <Link
-                    href={`/entries/${task.entry_id}`}
+                    href={`/entries/${todo.entry_id}`}
                     className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
                   >
                     View Entry →
@@ -92,7 +92,7 @@ export function TaskList({ tasks }: TaskListProps) {
             </div>
 
             <button
-              onClick={() => handleArchive(task.id)}
+              onClick={() => handleArchive(todo.id)}
               className="text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
             >
               Archive

@@ -26,10 +26,10 @@ export default async function Home() {
             Journal
           </h1>
           <Link
-            href="/tasks"
+            href="/todo"
             className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
           >
-            View Tasks
+            View Todo
           </Link>
         </div>
 

@@ -1,9 +1,9 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { addTask } from '@/app/tasks/actions'
+import { addTodo } from '@/app/todo/actions'
 
-export function TaskForm() {
+export function TodoForm() {
   const formRef = useRef<HTMLFormElement>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -12,7 +12,7 @@ export function TaskForm() {
     setIsSubmitting(true)
     setError(null)
 
-    const result = await addTask(formData)
+    const result = await addTodo(formData)
 
     if (result.error) {
       setError(result.error)
@@ -30,7 +30,7 @@ export function TaskForm() {
       className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900"
     >
       <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-        Add Task
+        Add Todo
       </h2>
 
       {error && (
@@ -45,7 +45,7 @@ export function TaskForm() {
             htmlFor="content"
             className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
           >
-            Task
+            Todo
           </label>
           <input
             type="text"
@@ -54,7 +54,7 @@ export function TaskForm() {
             required
             disabled={isSubmitting}
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50 dark:placeholder-zinc-500"
-            placeholder="Enter task"
+            placeholder="Enter todo"
           />
         </div>
 
@@ -80,7 +80,7 @@ export function TaskForm() {
         disabled={isSubmitting}
         className="w-full rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
       >
-        {isSubmitting ? 'Adding...' : 'Add Task'}
+        {isSubmitting ? 'Adding...' : 'Add Todo'}
       </button>
     </form>
   )

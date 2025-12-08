@@ -5,14 +5,32 @@ import { createClient } from '@/lib/supabase/server'
 import { generateEntryEmbedding } from '@/lib/ai/embeddings'
 
 async function createTasksFromContent(content: string, entryId: string, supabase: any) {
-  // Parse content for @task markers
-  const lines = content.split('\n')
-  const taskRegex = /@task\s+(.+)/i
+  // Parse content for [bracket] format markers like [task], [meditate], [Meditate Tomorrow]
+  const taskRegex = /\[([^\]]+)\]/g
+  const tasks: string[] = []
+  let match
 
-  for (const line of lines) {
-    const match = line.match(taskRegex)
-    if (match) {
-      const taskContent = match[1].trim()
+  // Extract all tasks from content
+  while ((match = taskRegex.exec(content)) !== null) {
+    const taskContent = match[1].trim()
+    if (taskContent) {
+      tasks.push(taskContent)
+    }
+  }
+
+  // Check existing tasks for this entry to prevent duplicates
+  const { data: existingTasks } = await supabase
+    .from('tasks')
+    .select('content')
+    .eq('entry_id', entryId)
+
+  const existingTaskContents = new Set(
+    existingTasks?.map((t: any) => t.content.toLowerCase()) || []
+  )
+
+  // Insert only new tasks
+  for (const taskContent of tasks) {
+    if (!existingTaskContents.has(taskContent.toLowerCase())) {
       await supabase.from('tasks').insert({
         content: taskContent,
         entry_id: entryId,
@@ -53,7 +71,7 @@ export async function addEntry(formData: FormData) {
     }
 
     revalidatePath('/')
-    revalidatePath('/tasks')
+    revalidatePath('/todo')
     return { success: true }
   } catch (embeddingError) {
     // If embedding generation fails, still save the entry without embedding
@@ -75,7 +93,7 @@ export async function addEntry(formData: FormData) {
     }
 
     revalidatePath('/')
-    revalidatePath('/tasks')
+    revalidatePath('/todo')
     return { success: true }
   }
 }
@@ -108,7 +126,7 @@ export async function updateEntry(id: string, formData: FormData) {
 
     revalidatePath(`/entries/${id}`)
     revalidatePath('/')
-    revalidatePath('/tasks')
+    revalidatePath('/todo')
     return { success: true }
   } catch (embeddingError) {
     // If embedding generation fails, still update the entry without new embedding
@@ -128,7 +146,7 @@ export async function updateEntry(id: string, formData: FormData) {
 
     revalidatePath(`/entries/${id}`)
     revalidatePath('/')
-    revalidatePath('/tasks')
+    revalidatePath('/todo')
     return { success: true }
   }
 }

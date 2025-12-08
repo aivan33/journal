@@ -1,10 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
-import type { Task } from '@/lib/supabase/types'
+import type { Todo } from '@/lib/supabase/types'
 import Link from 'next/link'
 
-export default async function ArchivedTasksPage() {
+export default async function ArchivedTodosPage() {
   const supabase = await createClient()
-  const { data: tasks } = await supabase
+  const { data: todos } = await supabase
     .from('tasks')
     .select('*')
     .eq('archived', true)
@@ -15,34 +15,34 @@ export default async function ArchivedTasksPage() {
       <main className="mx-auto max-w-4xl px-4 py-12">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-50">
-            Archived Tasks
+            Archived Todos
           </h1>
           <Link
-            href="/tasks"
+            href="/todo"
             className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
           >
-            Back to Active Tasks
+            Back to Active Todos
           </Link>
         </div>
 
         <div className="space-y-6">
-          {!tasks || tasks.length === 0 ? (
+          {!todos || todos.length === 0 ? (
             <p className="text-zinc-600 dark:text-zinc-400">
-              No archived tasks yet.
+              No archived todos yet.
             </p>
           ) : (
             <div className="space-y-2">
-              {tasks.map((task: Task) => {
-                const dueDate = task.due_date ? new Date(task.due_date) : null
+              {todos.map((todo: Todo) => {
+                const dueDate = todo.due_date ? new Date(todo.due_date) : null
 
                 return (
                   <div
-                    key={task.id}
+                    key={todo.id}
                     className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white p-4 opacity-75 dark:border-zinc-800 dark:bg-zinc-900"
                   >
                     <input
                       type="checkbox"
-                      checked={task.completed}
+                      checked={todo.completed}
                       disabled
                       className="h-5 w-5 rounded border-zinc-300 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800"
                     />
@@ -50,10 +50,10 @@ export default async function ArchivedTasksPage() {
                     <div className="flex-1">
                       <p
                         className={`text-zinc-900 dark:text-zinc-50 ${
-                          task.completed ? 'line-through' : ''
+                          todo.completed ? 'line-through' : ''
                         }`}
                       >
-                        {task.content}
+                        {todo.content}
                       </p>
 
                       <div className="mt-1 flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400">
@@ -61,9 +61,9 @@ export default async function ArchivedTasksPage() {
                           <span>Due: {dueDate.toLocaleDateString()}</span>
                         )}
 
-                        {task.entry_id && (
+                        {todo.entry_id && (
                           <Link
-                            href={`/entries/${task.entry_id}`}
+                            href={`/entries/${todo.entry_id}`}
                             className="hover:text-zinc-900 dark:hover:text-zinc-50"
                           >
                             View Entry →
@@ -72,7 +72,7 @@ export default async function ArchivedTasksPage() {
 
                         <span>
                           Archived:{' '}
-                          {new Date(task.updated_at).toLocaleDateString()}
+                          {new Date(todo.updated_at).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
