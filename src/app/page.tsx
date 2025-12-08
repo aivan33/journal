@@ -21,9 +21,17 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       <main className="mx-auto max-w-4xl px-4 py-12">
-        <h1 className="mb-8 text-4xl font-bold text-zinc-900 dark:text-zinc-50">
-          Journal
-        </h1>
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-50">
+            Journal
+          </h1>
+          <Link
+            href="/tasks"
+            className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+          >
+            View Tasks
+          </Link>
+        </div>
 
         <div className="mb-12">
           <EntryForm />
