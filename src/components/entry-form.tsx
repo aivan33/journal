@@ -42,6 +42,17 @@ export function EntryForm() {
     setIsSubmitting(false)
   }
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    // Submit on Cmd+Enter (macOS) or Ctrl+Enter (Windows/Linux)
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault()
+      if (formRef.current && !isSubmitting) {
+        const formData = new FormData(formRef.current)
+        handleSubmit(formData)
+      }
+    }
+  }
+
   return (
     <form
       ref={formRef}
@@ -71,6 +82,7 @@ export function EntryForm() {
           name="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          onKeyDown={handleKeyDown}
           required
           disabled={isSubmitting}
           className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50 dark:placeholder-zinc-500"
@@ -83,13 +95,14 @@ export function EntryForm() {
           htmlFor="content"
           className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
         >
-          Content (Markdown supported)
+          Content (Markdown supported) • Cmd+Enter to submit
         </label>
         <AutoTextarea
           id="content"
           name="content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
+          onKeyDown={handleKeyDown}
           required
           disabled={isSubmitting}
           minRows={4}
