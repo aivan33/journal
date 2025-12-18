@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateEntry, deleteEntry } from '@/app/actions'
-import Link from 'next/link'
 import { AutoTextarea } from './auto-textarea'
 import { Markdown } from './markdown'
 import { RelativeTime } from './relative-time'
@@ -28,12 +27,10 @@ export function EntryDetail({ entry }: Props) {
   const [title, setTitle] = useState(entry.title)
   const [content, setContent] = useState(entry.content)
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+  async function submitForm(formData: FormData) {
     setIsSubmitting(true)
     setError(null)
 
-    const formData = new FormData(e.currentTarget)
     const result = await updateEntry(entry.id, formData)
 
     if (result.error) {
@@ -45,11 +42,32 @@ export function EntryDetail({ entry }: Props) {
     }
   }
 
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    await submitForm(formData)
+  }
+
   function handleCancel() {
     setTitle(entry.title)
     setContent(entry.content)
     setError(null)
     setIsEditing(false)
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) {
+    // Submit on Cmd+Enter (macOS) or Ctrl+Enter (Windows/Linux)
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault()
+      e.stopPropagation()
+      if (!isSubmitting) {
+        const formElement = e.currentTarget.form
+        if (formElement) {
+          const formData = new FormData(formElement)
+          submitForm(formData)
+        }
+      }
+    }
   }
 
   async function handleDelete() {
@@ -98,6 +116,7 @@ export function EntryDetail({ entry }: Props) {
               name="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              onKeyDown={handleKeyDown}
               required
               disabled={isSubmitting}
               className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-lg font-semibold text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50 dark:placeholder-zinc-500"
@@ -109,13 +128,14 @@ export function EntryDetail({ entry }: Props) {
               htmlFor="content"
               className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Content (Markdown supported)
+              Content (Markdown supported) • Cmd+Enter to save
             </label>
             <AutoTextarea
               id="content"
               name="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
+              onKeyDown={handleKeyDown}
               required
               disabled={isSubmitting}
               minRows={12}

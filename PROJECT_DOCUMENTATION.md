@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-A modern, full-stack journal application built with Next.js 16, React 19, Supabase, and AI-powered semantic search. The application enables users to create and manage journal entries with markdown support, automatic task extraction, and AI-driven related entry recommendations.
+Full-stack journal application built with Next.js 16, React 19, Supabase, and AI-powered semantic search. The application enables users to create and manage journal entries with markdown support, automatic task extraction, and AI-driven related entry recommendations.
 
 **Project Name:** Journal
 **Version:** 0.1.0

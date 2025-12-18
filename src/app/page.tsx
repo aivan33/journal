@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { EntryForm } from '@/components/entry-form'
-import { Markdown } from '@/components/markdown'
-import { RelativeTime } from '@/components/relative-time'
+import { EntryCard } from '@/components/entry-card'
 import Link from 'next/link'
 
 type Entry = {
@@ -48,41 +47,9 @@ export default async function Home() {
             </p>
           ) : (
             <div className="space-y-4">
-              {entries.map((entry: Entry) => {
-                const contentPreview = entry.content.length > 200
-                  ? entry.content.slice(0, 200) + '...'
-                  : entry.content
-
-                return (
-                  <article
-                    key={entry.id}
-                    className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900"
-                  >
-                    <Link href={`/entries/${entry.id}`}>
-                      <h3 className="mb-2 text-xl font-semibold text-zinc-900 transition-colors hover:text-zinc-700 dark:text-zinc-50 dark:hover:text-zinc-300">
-                        {entry.title}
-                      </h3>
-                    </Link>
-                    <div className="mb-4 line-clamp-3">
-                      <Markdown content={contentPreview} />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <RelativeTime
-                        date={entry.created_at}
-                        className="text-sm text-zinc-500 dark:text-zinc-400"
-                      />
-                      {entry.content.length > 200 && (
-                        <Link
-                          href={`/entries/${entry.id}`}
-                          className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-                        >
-                          Read more →
-                        </Link>
-                      )}
-                    </div>
-                  </article>
-                )
-              })}
+              {entries.map((entry: Entry) => (
+                <EntryCard key={entry.id} entry={entry} />
+              ))}
             </div>
           )}
         </div>
