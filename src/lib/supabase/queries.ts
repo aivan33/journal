@@ -1,4 +1,5 @@
 import { createClient } from './server'
+import { logError } from '@/lib/logger'
 
 export type RelatedEntry = {
   id: string
@@ -36,7 +37,11 @@ export async function getRelatedEntries(
   })
 
   if (error) {
-    console.error('Error fetching related entries:', error)
+    logError(
+      new Error(error.message),
+      'Error fetching related entries via vector similarity',
+      { entryId, limit, errorCode: error.code }
+    )
     return []
   }
 

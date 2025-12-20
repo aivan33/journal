@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { generateEntryEmbedding } from '@/lib/ai/embeddings'
+import { logError } from '@/lib/logger'
 
 async function createTasksFromContent(content: string, entryId: string, supabase: any) {
   // Parse content for [bracket] format markers like [task], [meditate], [Meditate Tomorrow]
@@ -75,7 +76,11 @@ export async function addEntry(formData: FormData) {
     return { success: true }
   } catch (embeddingError) {
     // If embedding generation fails, still save the entry without embedding
-    console.error('Failed to generate embedding:', embeddingError)
+    logError(
+      embeddingError instanceof Error ? embeddingError : new Error(String(embeddingError)),
+      'Failed to generate embedding for entry, saving without embedding',
+      { title, contentLength: content.length }
+    )
 
     const { data, error } = await supabase
       .from('entries')
@@ -130,7 +135,11 @@ export async function updateEntry(id: string, formData: FormData) {
     return { success: true }
   } catch (embeddingError) {
     // If embedding generation fails, still update the entry without new embedding
-    console.error('Failed to generate embedding:', embeddingError)
+    logError(
+      embeddingError instanceof Error ? embeddingError : new Error(String(embeddingError)),
+      'Failed to generate embedding for entry update, saving without new embedding',
+      { entryId: id, title, contentLength: content.length }
+    )
 
     const { error } = await supabase
       .from('entries')

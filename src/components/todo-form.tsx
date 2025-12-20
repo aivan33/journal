@@ -1,9 +1,11 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { addTodo } from '@/app/todo/actions'
 
 export function TodoForm() {
+  const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -18,6 +20,7 @@ export function TodoForm() {
       setError(result.error)
     } else {
       formRef.current?.reset()
+      router.refresh()
     }
 
     setIsSubmitting(false)

@@ -1,3 +1,5 @@
+import { logError } from '@/lib/logger'
+
 export async function generateEmbedding(text: string): Promise<number[]> {
   const apiKey = process.env.VOYAGE_API_KEY
 
@@ -21,7 +23,11 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 
     if (!response.ok) {
       const error = await response.text()
-      console.error('Embedding API error:', error)
+      logError(
+        new Error(`Failed to generate embedding: ${response.statusText}`),
+        'Voyage AI API returned error',
+        { status: response.status, error }
+      )
       throw new Error(`Failed to generate embedding: ${response.statusText}`)
     }
 
@@ -31,7 +37,11 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     // Voyage AI returns: { data: [{ embedding: [...] }] }
     return data.data?.[0]?.embedding || []
   } catch (error) {
-    console.error('Error generating embedding:', error)
+    logError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      'Error generating embedding',
+      { textLength: text.length }
+    )
     throw new Error('Failed to generate embedding')
   }
 }
